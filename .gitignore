@@ -24,3 +24,4 @@ build/
 .git
 .svn
 node_modules/
+manager/vue/node_modules/
