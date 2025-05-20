@@ -1,7 +1,26 @@
-/.idea/
 # 编译生成的类文件
 *.class
 # 构建目录
 target/
 # 配置文件
 config.properties
+/.idea/
+
+#vue忽略文件
+#项目构建文件
+dist/
+build/
+*.js
+*.css
+*.map
+.DS_Store
+.idea/
+.vscode/
+#配置文件
+.env
+.editorconfig
+.prettierc
+#代码库
+.git
+.svn
+node_modules/
