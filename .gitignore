@@ -1,0 +1,7 @@
+/.idea/
+# 编译生成的类文件
+*.class
+# 构建目录
+target/
+# 配置文件
+config.properties
