@@ -52,6 +52,10 @@
             <i class="el-icon-school"></i>
             <span slot="title">班级管理</span>
           </el-menu-item>
+          <el-menu-item index="/resources">
+            <i class="el-icon-files"></i>
+            <span slot="title">教学资源管理</span>
+          </el-menu-item>
 
           <el-submenu index="user">
             <template slot="title">

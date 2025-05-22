@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.TeachingResourceMapper">
+
+    <sql id="Base_Column_List_TR">
+        tr.id, tr.name, tr.type, tr.path, tr.teacher_id, tr.course_id, tr.upload_time, tr.description, tr.size, tr.downloads
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.TeachingResource" useGeneratedKeys="true" keyProperty="id">
+        insert into teaching_resource (name, type, path, teacher_id, course_id, upload_time, description, size, downloads)
+        values (#{name}, #{type}, #{path}, #{teacherId}, #{courseId}, #{uploadTime}, #{description}, #{size}, #{downloads})
+    </insert>
+
+    <delete id="deleteById">
+        delete from teaching_resource where id = #{id}
+    </delete>
+
+    <update id="updateById" parameterType="com.example.entity.TeachingResource">
+        update teaching_resource
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="path != null">path = #{path},</if>
+            <if test="teacherId != null">teacher_id = #{teacherId},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="uploadTime != null">upload_time = #{uploadTime},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="size != null">size = #{size},</if>
+            <if test="downloads != null">downloads = #{downloads},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <update id="incrementDownloads">
+        update teaching_resource set downloads = downloads + 1 where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.example.entity.TeachingResource">
+        select
+        <include refid="Base_Column_List_TR"/>,
+        t.name as teacherName,
+        c.name as courseName
+        from teaching_resource tr
+        left join teacher t on tr.teacher_id = t.id
+        left join course c on tr.course_id = c.id
+        where tr.id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.TeachingResource">
+        select
+        <include refid="Base_Column_List_TR"/>,
+        t.name as teacherName,
+        c.name as courseName
+        from teaching_resource tr
+        left join teacher t on tr.teacher_id = t.id
+        left join course c on tr.course_id = c.id
+        <where>
+            <if test="id != null">and tr.id = #{id}</if>
+            <if test="name != null">and tr.name like concat('%', #{name}, '%')</if>
+            <if test="type != null">and tr.type like concat('%', #{type}, '%')</if>
+            <if test="teacherId != null">and tr.teacher_id = #{teacherId}</if>
+            <if test="courseId != null">and tr.course_id = #{courseId}</if>
+        </where>
+        order by tr.upload_time desc, tr.id desc
+    </select>
+</mapper>

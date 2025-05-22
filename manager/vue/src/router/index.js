@@ -28,6 +28,7 @@ const routes = [
       { path: 'notice', name: 'Notice', meta: { name: '公告信息' }, component: () => import('../views/manager/Notice') },
       { path: 'courses', name: 'CourseManagement', meta: { name: '课程管理' }, component: () => import('../views/manager/CourseManagement.vue') },
       { path: 'classes', name: 'ClassManagement', meta: { name: '班级管理' }, component: () => import('../views/manager/ClassManagement.vue') },
+      { path: 'resources', name: 'ResourceManagement', meta: { name: '教学资源管理' }, component: () => import('../views/manager/ResourceManagement.vue') },
     ]
   },
   {
@@ -37,8 +38,9 @@ const routes = [
     children: [
       { path: 'home', name: 'FrontHome', meta: { name: '系统首页' }, component: () => import('../views/front/Home') },
       { path: 'person', name: 'FrontPerson', meta: { name: '个人信息' }, component: () => import('../views/front/Person') },
-      {path: 'notices', name: 'FrontNoticeList', meta: { name: '公告列表' }, component: () => import('../views/front/NoticeList.vue')},
-      {path: 'notice/:id', name: 'FrontNoticeDetail', meta: { name: '公告详情' }, component: () => import('../views/front/NoticeDetail.vue')},
+      { path: 'notices', name: 'FrontNoticeList', meta: { name: '公告列表' }, component: () => import('../views/front/NoticeList.vue')},
+      { path: 'notice/:id', name: 'FrontNoticeDetail', meta: { name: '公告详情' }, component: () => import('../views/front/NoticeDetail.vue')},
+      { path: 'resources', name: 'FrontResourceLibrary', meta: { name: '资源库' }, component: () => import('../views/front/ResourceLibrary.vue') },
     ]
   },
   { path: '/login', name: 'Login', meta: { name: '登录' }, component: () => import('../views/Login.vue') },
