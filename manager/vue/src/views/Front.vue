@@ -11,8 +11,10 @@
           <el-menu :default-active="$route.path" mode="horizontal" router>
             <el-menu-item index="/front/home">首页</el-menu-item>
             <el-menu-item index="/front/notices">通知公告</el-menu-item>
-            <el-menu-item index="/front/person" v-if="user.username">个人中心</el-menu-item>
             <el-menu-item index="/front/resources">资源库</el-menu-item>
+            <el-menu-item index="/front/my-courses" v-if="user.role === 'STUDENT'">我的课程</el-menu-item>
+            <el-menu-item index="/front/my-submissions" v-if="user.role === 'STUDENT'">我的作业</el-menu-item>
+            <el-menu-item index="/front/person" v-if="user.username">个人中心</el-menu-item>
           </el-menu>
         </div>
       </div>

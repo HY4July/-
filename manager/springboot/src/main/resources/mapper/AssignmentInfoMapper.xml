@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.AssignmentInfoMapper">
+
+    <sql id="Base_Column_List_AI">
+        ai.id, ai.title, ai.content, ai.course_id, ai.teacher_id, ai.publish_time, ai.due_time, ai.attachment_path
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.AssignmentInfo" useGeneratedKeys="true" keyProperty="id">
+        insert into assignment_info (title, content, course_id, teacher_id, publish_time, due_time, attachment_path)
+        values (#{title}, #{content}, #{courseId}, #{teacherId}, #{publishTime}, #{dueTime}, #{attachmentPath})
+    </insert>
+
+    <delete id="deleteById">
+        delete from assignment_info where id = #{id}
+    </delete>
+
+    <update id="updateById" parameterType="com.example.entity.AssignmentInfo">
+        update assignment_info
+        <set>
+            <if test="title != null">title = #{title},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+            <if test="teacherId != null">teacher_id = #{teacherId},</if>
+            <if test="publishTime != null">publish_time = #{publishTime},</if>
+            <if test="dueTime != null">due_time = #{dueTime},</if>
+            <if test="attachmentPath != null">attachment_path = #{attachmentPath},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.example.entity.AssignmentInfo">
+        select <include refid="Base_Column_List_AI"/>,
+        c.name as courseName, t.name as teacherName
+        from assignment_info ai
+        left join course c on ai.course_id = c.id
+        left join teacher t on ai.teacher_id = t.id
+        where ai.id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.AssignmentInfo">
+        select <include refid="Base_Column_List_AI"/>,
+        c.name as courseName, t.name as teacherName
+        from assignment_info ai
+        left join course c on ai.course_id = c.id
+        left join teacher t on ai.teacher_id = t.id
+        <where>
+            <if test="id != null">and ai.id = #{id}</if>
+            <if test="title != null">and ai.title like concat('%', #{title}, '%')</if>
+            <if test="courseId != null">and ai.course_id = #{courseId}</if>
+            <if test="teacherId != null">and ai.teacher_id = #{teacherId}</if>
+        </where>
+        order by ai.publish_time desc, ai.id desc
+    </select>
+
+    <select id="selectByCourseId" resultType="com.example.entity.AssignmentInfo">
+        select <include refid="Base_Column_List_AI"/>,
+        c.name as courseName, t.name as teacherName
+        from assignment_info ai
+        left join course c on ai.course_id = c.id
+        left join teacher t on ai.teacher_id = t.id
+        where ai.course_id = #{courseId}
+        order by ai.publish_time desc, ai.id desc
+    </select>
+
+    <select id="selectByTeacherId" resultType="com.example.entity.AssignmentInfo">
+        select <include refid="Base_Column_List_AI"/>,
+        c.name as courseName, t.name as teacherName
+        from assignment_info ai
+        left join course c on ai.course_id = c.id
+        left join teacher t on ai.teacher_id = t.id
+        where ai.teacher_id = #{teacherId}
+        order by ai.publish_time desc, ai.id desc
+    </select>
+</mapper>

@@ -1,6 +1,5 @@
 <template>
   <div class="manager-container">
-    <!--  头部  -->
     <div class="manager-header">
       <div class="manager-header-left">
         <img src="@/assets/imgs/logo.png" />
@@ -29,9 +28,7 @@
       </div>
     </div>
 
-    <!--  主体  -->
     <div class="manager-main">
-      <!--  侧边栏  -->
       <div class="manager-main-left">
         <el-menu :default-openeds="['info', 'user']" router style="border: none" :default-active="$route.path">
           <el-menu-item index="/home">
@@ -57,6 +54,10 @@
             <span slot="title">教学资源管理</span>
           </el-menu-item>
 
+          <el-menu-item index="/assignments" v-if="user.role === 'TEACHER' || user.role === 'ADMIN'">
+            <i class="el-icon-document-checked"></i>
+            <span slot="title">作业管理</span>
+          </el-menu-item>
           <el-submenu index="user">
             <template slot="title">
               <i class="el-icon-menu"></i><span>用户管理</span>
@@ -68,7 +69,6 @@
         </el-menu>
       </div>
 
-      <!--  数据表格  -->
       <div class="manager-main-right">
         <router-view @update:user="updateUser" />
       </div>
@@ -92,7 +92,7 @@ export default {
   },
   methods: {
     updateUser() {
-      this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')   // 重新获取下用户的最新信息
+      this.user = JSON.parse(localStorage.getItem('xm-user') || '{}')
     },
     goToPerson() {
       if (this.user.role === 'ADMIN') {

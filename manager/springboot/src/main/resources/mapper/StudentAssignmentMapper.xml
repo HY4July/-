@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.StudentAssignmentMapper">
+
+    <sql id="Base_Column_List_SA">
+        sa.id, sa.assignment_id, sa.student_id, sa.submission_content, sa.submission_file_path,
+        sa.submission_time, sa.status, sa.score, sa.teacher_comment, sa.graded_time, sa.graded_file_path
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.StudentAssignment" useGeneratedKeys="true" keyProperty="id">
+        insert into student_assignment
+        (assignment_id, student_id, submission_content, submission_file_path, submission_time, status, score, teacher_comment, graded_time, graded_file_path)
+        values
+            (#{assignmentId}, #{studentId}, #{submissionContent}, #{submissionFilePath}, #{submissionTime}, #{status}, #{score}, #{teacherComment}, #{gradedTime}, #{gradedFilePath})
+    </insert>
+
+    <update id="updateById" parameterType="com.example.entity.StudentAssignment">
+        update student_assignment
+        <set>
+            <if test="submissionContent != null">submission_content = #{submissionContent},</if>
+            <if test="submissionFilePath != null">submission_file_path = #{submissionFilePath},</if>
+            <if test="submissionTime != null">submission_time = #{submissionTime},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="teacherComment != null">teacher_comment = #{teacherComment},</if>
+            <if test="gradedTime != null">graded_time = #{gradedTime},</if>
+            <if test="gradedFilePath != null">graded_file_path = #{gradedFilePath},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.example.entity.StudentAssignment">
+        select <include refid="Base_Column_List_SA"/>,
+        s.name as studentName, ai.title as assignmentTitle, c.name as courseName
+        from student_assignment sa
+        join student s on sa.student_id = s.id
+        join assignment_info ai on sa.assignment_id = ai.id
+        left join course c on ai.course_id = c.id
+        where sa.id = #{id}
+    </select>
+
+    <select id="selectByAssignmentAndStudent" resultType="com.example.entity.StudentAssignment">
+        select <include refid="Base_Column_List_SA"/>,
+        s.name as studentName, ai.title as assignmentTitle, c.name as courseName
+        from student_assignment sa
+        join student s on sa.student_id = s.id
+        join assignment_info ai on sa.assignment_id = ai.id
+        left join course c on ai.course_id = c.id
+        where sa.assignment_id = #{assignmentId} and sa.student_id = #{studentId}
+    </select>
+
+    <select id="selectByAssignmentId" resultType="com.example.entity.StudentAssignment">
+        select <include refid="Base_Column_List_SA"/>,
+        s.name as studentName, ai.title as assignmentTitle, c.name as courseName
+        from student_assignment sa
+        join student s on sa.student_id = s.id
+        join assignment_info ai on sa.assignment_id = ai.id
+        left join course c on ai.course_id = c.id
+        where sa.assignment_id = #{assignmentId}
+        order by sa.submission_time desc
+    </select>
+
+    <select id="selectByStudentId" resultType="com.example.entity.StudentAssignment">
+        select <include refid="Base_Column_List_SA"/>,
+        s.name as studentName, ai.title as assignmentTitle, c.name as courseName
+        from student_assignment sa
+        join student s on sa.student_id = s.id
+        join assignment_info ai on sa.assignment_id = ai.id
+        left join course c on ai.course_id = c.id
+        where sa.student_id = #{studentId}
+        order by ai.publish_time desc, sa.submission_time desc
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.StudentAssignment">
+        select <include refid="Base_Column_List_SA"/>,
+        s.name as studentName, ai.title as assignmentTitle, c.name as courseName
+        from student_assignment sa
+        join student s on sa.student_id = s.id
+        join assignment_info ai on sa.assignment_id = ai.id
+        left join course c on ai.course_id = c.id
+        <where>
+            <if test="assignmentId != null">and sa.assignment_id = #{assignmentId}</if>
+            <if test="studentId != null">and sa.student_id = #{studentId}</if>
+            <if test="status != null">and sa.status like concat('%', #{status}, '%')</if>
+        </where>
+        order by sa.id desc
+    </select>
+
+    <delete id="deleteById">
+        delete from student_assignment where id = #{id}
+    </delete>
+
+    <delete id="deleteByAssignmentId">
+        delete from student_assignment where assignment_id = #{assignmentId}
+    </delete>
+</mapper>

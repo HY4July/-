@@ -29,6 +29,7 @@ const routes = [
       { path: 'courses', name: 'CourseManagement', meta: { name: '课程管理' }, component: () => import('../views/manager/CourseManagement.vue') },
       { path: 'classes', name: 'ClassManagement', meta: { name: '班级管理' }, component: () => import('../views/manager/ClassManagement.vue') },
       { path: 'resources', name: 'ResourceManagement', meta: { name: '教学资源管理' }, component: () => import('../views/manager/ResourceManagement.vue') },
+      { path: 'assignments', name: 'AssignmentManagement', meta: { name: '作业管理' }, component: () => import('../views/manager/AssignmentManagement.vue') },
     ]
   },
   {
@@ -41,6 +42,9 @@ const routes = [
       { path: 'notices', name: 'FrontNoticeList', meta: { name: '公告列表' }, component: () => import('../views/front/NoticeList.vue')},
       { path: 'notice/:id', name: 'FrontNoticeDetail', meta: { name: '公告详情' }, component: () => import('../views/front/NoticeDetail.vue')},
       { path: 'resources', name: 'FrontResourceLibrary', meta: { name: '资源库' }, component: () => import('../views/front/ResourceLibrary.vue') },
+      { path: 'course/:courseId/assignments', name: 'FrontCourseAssignments', meta: { name: '课程作业' }, component: () => import('../views/front/CourseAssignments.vue'), props: true },
+      { path: 'my-submissions', name: 'FrontMySubmissions', meta: { name: '我的作业' }, component: () => import('../views/front/MySubmissions.vue') },
+      { path: 'my-courses', name: 'FrontMyCourses', meta: { name: '我的课程' }, component: () => import('../views/front/MyCourses.vue')},
     ]
   },
   { path: '/login', name: 'Login', meta: { name: '登录' }, component: () => import('../views/Login.vue') },
