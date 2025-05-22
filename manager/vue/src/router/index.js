@@ -26,6 +26,8 @@ const routes = [
       { path: 'studentPerson', name: 'StudentPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/StudentPerson') },
       { path: 'password', name: 'Password', meta: { name: '修改密码' }, component: () => import('../views/manager/Password') },
       { path: 'notice', name: 'Notice', meta: { name: '公告信息' }, component: () => import('../views/manager/Notice') },
+      { path: 'courses', name: 'CourseManagement', meta: { name: '课程管理' }, component: () => import('../views/manager/CourseManagement.vue') },
+      { path: 'classes', name: 'ClassManagement', meta: { name: '班级管理' }, component: () => import('../views/manager/ClassManagement.vue') },
     ]
   },
   {

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.CourseMapper">
+
+    <sql id="Base_Column_List">
+        id, name, type, teacher_id, score, num, room, week, segment, status
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.Course" useGeneratedKeys="true" keyProperty="id">
+        insert into course (name, type, teacher_id, score, num, room, week, segment, status)
+        values (#{name}, #{type}, #{teacherId}, #{score}, #{num}, #{room}, #{week}, #{segment}, #{status})
+    </insert>
+
+    <delete id="deleteById">
+        delete from course where id = #{id}
+    </delete>
+
+    <update id="updateById" parameterType="com.example.entity.Course">
+        update course
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="type != null">type = #{type},</if>
+            <if test="teacherId != null">teacher_id = #{teacherId},</if>
+            <if test="score != null">score = #{score},</if>
+            <if test="num != null">num = #{num},</if>
+            <if test="room != null">room = #{room},</if>
+            <if test="week != null">week = #{week},</if>
+            <if test="segment != null">segment = #{segment},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.example.entity.Course">
+        select c.*, t.name as teacherName
+        from course c
+                 left join teacher t on c.teacher_id = t.id
+        where c.id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.Course">
+        select c.*, t.name as teacherName
+        from course c
+        left join teacher t on c.teacher_id = t.id
+        <where>
+            <if test="id != null">and c.id = #{id}</if>
+            <if test="name != null">and c.name like concat('%', #{name}, '%')</if>
+            <if test="type != null">and c.type like concat('%', #{type}, '%')</if>
+            <if test="teacherId != null">and c.teacher_id = #{teacherId}</if>
+            <if test="status != null">and c.status = #{status}</if>
+        </where>
+        order by c.id desc
+    </select>
+
+    <select id="selectByTeacherId" resultType="com.example.entity.Course">
+        select <include refid="Base_Column_List"/>
+        from course
+        where teacher_id = #{teacherId}
+        order by id desc
+    </select>
+
+    <select id="selectStudentEnrolledCourses" resultType="com.example.entity.Course">
+        SELECT c.*, t.name as teacherName
+        FROM course c
+                 LEFT JOIN teacher t ON c.teacher_id = t.id
+                 JOIN student_course_enrollment sce ON c.id = sce.course_id
+        WHERE sce.student_id = #{studentId} AND sce.status = 'ENROLLED'
+        ORDER BY c.id DESC
+    </select>
+
+    <select id="selectAvailableCoursesForStudent" resultType="com.example.entity.Course">
+        SELECT c.*, t.name as teacherName
+        FROM course c
+        LEFT JOIN teacher t ON c.teacher_id = t.id
+        WHERE c.status = '即将开课' OR c.status = '进行中' AND c.id NOT IN (
+        SELECT sce.course_id
+        FROM student_course_enrollment sce
+        WHERE sce.student_id = #{studentId} AND sce.status = 'ENROLLED'
+        )
+        <if test="courseName != null and courseName != ''">
+            AND c.name LIKE concat('%', #{courseName}, '%')
+        </if>
+        ORDER BY c.id DESC
+    </select>
+</mapper>

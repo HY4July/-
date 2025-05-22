@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.ClassesMapper">
+
+    <sql id="Base_Column_List">
+        id, name, content, teacher_id, speciality_id
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.Classes" useGeneratedKeys="true" keyProperty="id">
+        insert into classes (name, content, teacher_id, speciality_id)
+        values (#{name}, #{content}, #{teacherId}, #{specialityId})
+    </insert>
+
+    <delete id="deleteById">
+        delete from classes where id = #{id}
+    </delete>
+
+    <update id="updateById" parameterType="com.example.entity.Classes">
+        update classes
+        <set>
+            <if test="name != null">name = #{name},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="teacherId != null">teacher_id = #{teacherId},</if>
+            <if test="specialityId != null">speciality_id = #{specialityId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.example.entity.Classes">
+        select cl.*, t.name as teacherName from classes cl
+                                                    left join teacher t on cl.teacher_id = t.id
+        where cl.id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.Classes">
+        select cl.*, t.name as teacherName
+        from classes cl
+        left join teacher t on cl.teacher_id = t.id
+        <where>
+            <if test="id != null">and cl.id = #{id}</if>
+            <if test="name != null">and cl.name like concat('%', #{name}, '%')</if>
+            <if test="teacherId != null">and cl.teacher_id = #{teacherId}</if>
+            <if test="specialityId != null">and cl.speciality_id = #{specialityId}</if>
+        </where>
+        order by cl.id desc
+    </select>
+</mapper>

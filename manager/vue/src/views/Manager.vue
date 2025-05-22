@@ -44,6 +44,14 @@
             </template>
             <el-menu-item index="/notice">公告信息</el-menu-item>
           </el-submenu>
+          <el-menu-item index="/courses">
+            <i class="el-icon-notebook-1"></i>
+            <span slot="title">课程管理</span>
+          </el-menu-item>
+          <el-menu-item index="/classes">
+            <i class="el-icon-school"></i>
+            <span slot="title">班级管理</span>
+          </el-menu-item>
 
           <el-submenu index="user">
             <template slot="title">

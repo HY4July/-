@@ -4,29 +4,39 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.mapper.StudentMapper">
 
-    <sql id="Base_Column_List">
-        id,username,password,name,avatar,role,college_id,speciality_id,class_id,score
+    <sql id="Base_Student_Column_List">
+        s.id, s.username, s.password, s.name, s.avatar, s.role, s.college_id, s.speciality_id, s.class_id, s.score
     </sql>
 
     <select id="selectAll" resultType="com.example.entity.Student">
         select
-        <include refid="Base_Column_List" />
-        from student
+        <include refid="Base_Student_Column_List" />,
+        cl.name as className  from
+        student s
+        left join
+        classes cl on s.class_id = cl.id
         <where>
-            <if test="id != null"> and id= #{id}</if>
-            <if test="username != null"> and username like concat('%', #{username}, '%')</if>
-            <if test="password != null"> and password= #{password}</if>
-            <if test="name != null"> and name= #{name}</if>
-            <if test="avatar != null"> and avatar= #{avatar}</if>
-            <if test="role != null"> and role= #{role}</if>
+            <if test="id != null"> and s.id = #{id}</if>
+            <if test="username != null"> and s.username like concat('%', #{username}, '%')</if>
+            <if test="password != null"> and s.password = #{password}</if>
+            <if test="name != null"> and s.name like concat('%', #{name}, '%')</if> <if test="avatar != null"> and s.avatar = #{avatar}</if>
+            <if test="role != null"> and s.role = #{role}</if>
+            <if test="classId != null"> and s.class_id = #{classId}</if>
+            <if test="collegeId != null"> and s.college_id = #{collegeId}</if>
+            <if test="specialityId != null"> and s.speciality_id = #{specialityId}</if>
         </where>
+        order by s.id desc
     </select>
 
     <select id="selectById" resultType="com.example.entity.Student">
         select
-        <include refid="Base_Column_List" />
-        from student
-        where id = #{id}
+        <include refid="Base_Student_Column_List" />,
+        cl.name as className
+        from
+        student s
+        left join
+        classes cl on s.class_id = cl.id
+        where s.id = #{id}
     </select>
 
     <delete id="deleteById">
@@ -34,7 +44,7 @@
         where  id = #{id}
     </delete>
 
-    <insert id="insert" parameterType="com.example.entity.Student" useGeneratedKeys="true">
+    <insert id="insert" parameterType="com.example.entity.Student" useGeneratedKeys="true" keyProperty="id">
         insert into student
         <trim prefix="(" suffix=")" suffixOverrides=",">
             <if test="id != null">id,</if>
@@ -61,7 +71,7 @@
             <if test="score != null">#{score},</if>
         </trim>
     </insert>
-    <!--college_id,spaciality_id,class_id,score-->
+
     <update id="updateById" parameterType="com.example.entity.Student">
         update student
         <set>
@@ -84,8 +94,7 @@
                 college_id = #{collegeId},
             </if>
             <if test="specialityId != null">
-                spaciality_id = #{specialityId},
-            </if>
+                speciality_id = #{specialityId}, </if>
             <if test="classId != null">
                 class_id = #{classId},
             </if>

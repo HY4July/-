@@ -8,6 +8,9 @@ public enum ResultCodeEnum {
     TOKEN_CHECK_ERROR("401", "token验证失败，请重新登录"),
     PARAM_LOST_ERROR("4001", "参数缺失"),
 
+    // ===== 新增权限不足的错误码 =====
+    PERMISSION_DENIED_ERROR("403", "无权限操作"), // 新增这行
+
     SYSTEM_ERROR("500", "系统异常"),
     USER_EXIST_ERROR("5001", "用户名已存在"),
     USER_NOT_LOGIN("5002", "用户未登录"),

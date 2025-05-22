@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.StudentCourseEnrollmentMapper">
+
+    <sql id="Base_Column_List">
+        id, student_id, course_id, enrollment_date, status
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.StudentCourseEnrollment" useGeneratedKeys="true" keyProperty="id">
+        insert into student_course_enrollment (student_id, course_id, enrollment_date, status)
+        values (#{studentId}, #{courseId}, #{enrollmentDate}, #{status})
+    </insert>
+
+    <delete id="deleteById">
+        delete from student_course_enrollment where id = #{id}
+    </delete>
+
+    <delete id="deleteByStudentAndCourse">
+        delete from student_course_enrollment where student_id = #{studentId} and course_id = #{courseId}
+    </delete>
+
+    <update id="updateStatus" parameterType="com.example.entity.StudentCourseEnrollment">
+        update student_course_enrollment
+        set status = #{status}
+        where student_id = #{studentId} and course_id = #{courseId}
+    </update>
+
+    <select id="selectByStudentAndCourse" resultType="com.example.entity.StudentCourseEnrollment">
+        select <include refid="Base_Column_List"/>
+        from student_course_enrollment
+        where student_id = #{studentId} and course_id = #{courseId}
+    </select>
+
+    <select id="selectByStudentId" resultType="com.example.entity.StudentCourseEnrollment">
+        select sce.*, s.name as studentName, c.name as courseName
+        from student_course_enrollment sce
+                 JOIN student s ON sce.student_id = s.id
+                 JOIN course c ON sce.course_id = c.id
+        where sce.student_id = #{studentId}
+    </select>
+
+    <select id="selectByCourseId" resultType="com.example.entity.StudentCourseEnrollment">
+        select sce.*, s.name as studentName, c.name as courseName
+        from student_course_enrollment sce
+                 JOIN student s ON sce.student_id = s.id
+                 JOIN course c ON sce.course_id = c.id
+        where sce.course_id = #{courseId}
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.StudentCourseEnrollment">
+        select sce.*, s.name as studentName, c.name as courseName
+        from student_course_enrollment sce
+        JOIN student s ON sce.student_id = s.id
+        JOIN course c ON sce.course_id = c.id
+        <where>
+            <if test="studentId != null">and sce.student_id = #{studentId}</if>
+            <if test="courseId != null">and sce.course_id = #{courseId}</if>
+            <if test="status != null">and sce.status like concat('%', #{status}, '%')</if>
+        </where>
+        order by sce.id desc
+    </select>
+</mapper>
