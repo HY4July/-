@@ -13,8 +13,8 @@ const routes = [
   {
     path: '/',
     name: 'Manager',
-    component: () => import('../views/Manager.vue'),
-    redirect: '/home',  // 重定向到主页
+    component: () => import('../views/Manager.vue'), // 假设这是管理员/教师的布局组件
+    redirect: '/home',  // 默认重定向到后台首页
     children: [
       { path: '403', name: 'NoAuth', meta: { name: '无权限' }, component: () => import('../views/manager/403') },
       { path: 'home', name: 'Home', meta: { name: '系统首页' }, component: () => import('../views/manager/Home') },
@@ -23,7 +23,7 @@ const routes = [
       { path: 'student', name: 'Student', meta: { name: '学生信息' }, component: () => import('../views/manager/Student') },
       { path: 'adminPerson', name: 'AdminPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/AdminPerson') },
       { path: 'teacherPerson', name: 'TeacherPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/TeacherPerson') },
-      { path: 'studentPerson', name: 'StudentPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/StudentPerson') },
+      { path: 'studentPerson', name: 'StudentPerson', meta: { name: '个人信息' }, component: () => import('../views/manager/StudentPerson') }, // 注意：这个是 Manager 布局下的学生个人信息，可能与 /front/person 功能重复或不同
       { path: 'password', name: 'Password', meta: { name: '修改密码' }, component: () => import('../views/manager/Password') },
       { path: 'notice', name: 'Notice', meta: { name: '公告信息' }, component: () => import('../views/manager/Notice') },
       { path: 'courses', name: 'CourseManagement', meta: { name: '课程管理' }, component: () => import('../views/manager/CourseManagement.vue') },
@@ -35,7 +35,9 @@ const routes = [
   {
     path: '/front',
     name: 'Front',
-    component: () => import('../views/Front.vue'),
+    component: () => import('../views/Front.vue'), // 这是学生的布局组件
+    // 建议为 /front 也添加一个默认的子路由，例如 /front/home
+    redirect: '/front/home',
     children: [
       { path: 'home', name: 'FrontHome', meta: { name: '系统首页' }, component: () => import('../views/front/Home') },
       { path: 'person', name: 'FrontPerson', meta: { name: '个人信息' }, component: () => import('../views/front/Person') },
@@ -58,23 +60,34 @@ const router = new VueRouter({
   routes
 })
 
-// 注：不需要前台的项目，可以注释掉该路由守卫
-// 路由守卫
-// router.beforeEach((to ,from, next) => {
-//   let user = JSON.parse(localStorage.getItem("xm-user") || '{}');
-//   if (to.path === '/') {
-//     if (user.role) {
-//       if (user.role === 'USER') {
-//         next('/front/home')
-//       } else {
-//         next('/home')
-//       }
-//     } else {
-//       next('/login')
-//     }
-//   } else {
-//     next()
-//   }
-// })
+// 启用并修改路由守卫
+router.beforeEach((to, from, next) => {
+  const user = JSON.parse(localStorage.getItem("xm-user") || '{}');
+  const userRole = user.role;
+
+  // 如果用户尝试访问根路径 /
+  if (to.path === '/') {
+    if (userRole) {
+      if (userRole === 'STUDENT') {
+        next('/front/home'); // 学生重定向到 /front/home
+      } else { // ADMIN 或 TEACHER
+        next('/home');       // 管理员或教师重定向到 /home
+      }
+    } else {
+      next('/login'); // 没有用户信息则重定向到登录
+    }
+  }
+      // 如果学生尝试访问非 /front/ 开头的路径 (且不是登录或注册页)
+      // 可以选择将他们重定向回 /front/home 或显示一个无权限页面
+      // 此部分为可选增强，取决于你的具体需求
+  /*
+  else if (userRole === 'STUDENT' && !to.path.startsWith('/front') && to.name !== 'Login' && to.name !== 'Register') {
+    next('/front/home');
+  }
+  */
+  else {
+    next(); // 其他情况正常放行
+  }
+});
 
 export default router

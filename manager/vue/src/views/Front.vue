@@ -1,58 +1,94 @@
 <template>
-  <div>
-    <div class="front-notice"><i class="el-icon-bell" style="margin-right: 2px"></i>公告：{{ top }}</div>
-    <div class="front-header">
-      <div class="front-header-left">
-        <img src="@/assets/imgs/logo.png" alt="">
-        <div class="title">项目前台</div>
+  <div class="manager-container">
+    <div v-if="top" class="front-notice-bar">
+      <i class="el-icon-bell" style="margin-right: 2px"></i>公告：{{ top }}
+    </div>
+
+    <div class="manager-header">
+      <div class="manager-header-left">
+        <img src="@/assets/imgs/logo.png" alt="Logo" @click="goToFrontHome" style="cursor: pointer;">
+        <div class="title" @click="goToFrontHome" style="cursor: pointer;">教学互动平台</div>
       </div>
-      <div class="front-header-center">
-        <div class="front-header-nav">
-          <el-menu :default-active="$route.path" mode="horizontal" router>
-            <el-menu-item index="/front/home">首页</el-menu-item>
-            <el-menu-item index="/front/notices">通知公告</el-menu-item>
-            <el-menu-item index="/front/resources">资源库</el-menu-item>
-            <el-menu-item index="/front/my-courses" v-if="user.role === 'STUDENT'">我的课程</el-menu-item>
-            <el-menu-item index="/front/my-submissions" v-if="user.role === 'STUDENT'">我的作业</el-menu-item>
-            <el-menu-item index="/front/person" v-if="user.username">个人中心</el-menu-item>
-          </el-menu>
-        </div>
+      <div class="manager-header-center">
+        <el-breadcrumb separator-class="el-icon-arrow-right" v-if="$route.meta.name && $route.path !== '/front/home'">
+          <el-breadcrumb-item :to="{ path: '/front/home' }">首页</el-breadcrumb-item>
+          <el-breadcrumb-item>{{ $route.meta.name }}</el-breadcrumb-item>
+        </el-breadcrumb>
       </div>
-      <div class="front-header-right">
-        <div v-if="!user.username">
-          <el-button @click="$router.push('/login')">登录</el-button>
+      <div class="manager-header-right">
+        <div v-if="!user.username" style="display: flex; align-items: center;">
+          <el-button style="margin-right: 10px;" @click="$router.push('/login')">登录</el-button>
           <el-button @click="$router.push('/register')">注册</el-button>
         </div>
         <div v-else>
-          <el-dropdown @command="handleCommand"> <div class="front-header-dropdown">
-            <img :src="user.avatar || require('@/assets/imgs/default-avatar.png')" alt=""> <div style="margin-left: 10px">
-            <span>{{ user.name }}</span><i class="el-icon-arrow-down" style="margin-left: 5px"></i>
-          </div>
-          </div>
+          <el-dropdown class="avatar-container" @command="handleCommand">
+            <div class="avatar-wrapper">
+              <img :src="user.avatar || require('@/assets/imgs/default-avatar.png')" class="user-avatar" alt="User Avatar">
+              <span class="user-name">{{ user.name || user.username }}</span>
+              <i class="el-icon-arrow-down el-icon--right"></i>
+            </div>
             <el-dropdown-menu slot="dropdown">
               <el-dropdown-item command="person">个人中心</el-dropdown-item>
-              <el-dropdown-item command="logout">退出登录</el-dropdown-item>
+              <el-dropdown-item command="logout" divided>退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </div>
       </div>
     </div>
-    <div class="main-body">
-      <router-view ref="child" @update:user="updateUser" />
+
+    <div class="manager-main">
+      <div class="manager-main-left">
+        <el-menu
+            :default-active="$route.path"
+            class="el-menu-vertical-demo"
+            router
+            style="border-right: none;"
+            background-color="#222b40"
+            text-color="#ccc"
+            active-text-color="#409EFF"
+            :unique-opened="true">
+
+          <el-menu-item index="/front/home">
+            <i class="el-icon-s-home"></i>
+            <span slot="title">首页</span>
+          </el-menu-item>
+
+          <template v-if="user.role === 'STUDENT'">
+            <el-menu-item index="/front/my-courses">
+              <i class="el-icon-notebook-2"></i>
+              <span slot="title">我的课程</span>
+            </el-menu-item>
+            <el-menu-item index="/front/my-submissions">
+              <i class="el-icon-document-checked"></i>
+              <span slot="title">我的作业</span>
+            </el-menu-item>
+          </template>
+
+          <el-menu-item index="/front/resources">
+            <i class="el-icon-files"></i>
+            <span slot="title">资源库</span>
+          </el-menu-item>
+
+          <el-menu-item index="/front/notices">
+            <i class="el-icon-bell"></i>
+            <span slot="title">通知公告</span>
+          </el-menu-item>
+
+          <el-menu-item index="/front/person" v-if="user.username">
+            <i class="el-icon-user"></i>
+            <span slot="title">个人中心</span>
+          </el-menu-item>
+        </el-menu>
+      </div>
+
+      <div class="manager-main-right">
+        <router-view @update:user="updateUser" />
+      </div>
     </div>
   </div>
-
 </template>
 
 <script>
-// ... script 部分保持不变，但为了让个人中心通过 el-dropdown-item 跳转，
-// 你需要在 methods 中添加 handleCommand 方法 (如果还没有的话，或者修改现有的)
-// 我在上面的 template 的 el-dropdown 中补充了 @command="handleCommand"
-// 并且在 el-dropdown-menu 中补充了 command="person"
-// 同时，你可能需要确保用户头像 user.avatar 有一个默认值，以防图片链接失效或用户未上传头像
-// 例如： <img :src="user.avatar || require('@/assets/imgs/default-avatar.png')" alt="">
-// 请确保你有一个默认头像图片放在 @/assets/imgs/default-avatar.png
-
 export default {
   name: "FrontLayout",
   data () {
@@ -63,55 +99,63 @@ export default {
     }
   },
   mounted() {
-    this.loadNotice()
+    this.loadNotice();
+    this.checkUser(); // 确保用户信息被加载
   },
   methods: {
+    checkUser() {
+      // 如果this.user为空对象但localStorage中有数据，则重新加载
+      if (Object.keys(this.user).length === 0 && localStorage.getItem("xm-user")) {
+        this.user = JSON.parse(localStorage.getItem("xm-user"));
+      }
+    },
+    goToFrontHome() {
+      if (this.$route.path !== '/front/home') {
+        this.$router.push('/front/home');
+      }
+    },
     loadNotice() {
-      // 假设 this.$request 是在 main.js 中全局配置的 axios 实例
       this.$request.get('/notice/selectAll').then(res => {
-        if (res.code === '200' && res.data) { // 确保 res.data 存在
+        if (res.code === '200' && res.data && res.data.length) {
           this.notice = res.data;
           let i = 0;
-          if (this.notice && this.notice.length) {
-            this.top = this.notice[0].content;
-            // 建议将 setInterval 放在 mounted 钩子中，并在 beforeDestroy 中清除，避免内存泄漏
-            // 但为了保持与您原代码逻辑一致，暂时保留在此
-            const intervalId = setInterval(() => {
-              if (this.notice && this.notice.length > 0) { // 增加判断
-                this.top = this.notice[i].content;
-                i++;
-                if (i === this.notice.length) {
-                  i = 0;
-                }
-              }
-            }, 2500);
-            // 如果组件销毁，记得清除定时器
-            this.$once('hook:beforeDestroy', () => {
-              clearInterval(intervalId);
-            });
-          }
+          this.top = this.notice[0].content;
+          const intervalId = setInterval(() => {
+            if (this.notice.length > 0) { // 确保 notice 数组仍然有内容
+              this.top = this.notice[i % this.notice.length].content;
+              i++;
+            } else {
+              clearInterval(intervalId); // 如果公告列表为空则清除定时器
+              this.top = "暂无最新公告";
+            }
+          }, 7000);
+          this.$once('hook:beforeDestroy', () => {
+            clearInterval(intervalId);
+          });
         } else {
-          // 可以选择性地处理错误，例如 this.top = "暂无公告";
           this.top = "暂无最新公告";
         }
       }).catch(err => {
         console.error("加载公告失败:", err);
-        this.top = "加载公告失败";
+        this.top = "公告加载失败";
       });
     },
-    updateUser() {
+    updateUser() { // 当子组件（如个人中心）更新了用户信息后，触发此方法
       this.user = JSON.parse(localStorage.getItem('xm-user') || '{}');
     },
     logout() {
       localStorage.removeItem("xm-user");
-      this.user = {}; // 清空本地用户信息
+      this.user = {};
       this.$router.push("/login");
+      this.$message.success("退出成功");
     },
-    handleCommand(command) { // 新增或修改此方法
+    handleCommand(command) {
       if (command === 'logout') {
         this.logout();
       } else if (command === 'person') {
-        this.$router.push('/front/person');
+        if (this.$route.path !== '/front/person') {
+          this.$router.push('/front/person');
+        }
       }
     }
   }
@@ -119,5 +163,109 @@ export default {
 </script>
 
 <style scoped>
-@import "@/assets/css/front.css";
+/* 引入 manager.css 以复用其布局和 ElementUI 覆写样式 */
+@import "@/assets/css/manager.css";
+@import "@/assets/css/global.css"; /* 引入全局样式 */
+
+.manager-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f8ff;
+}
+
+.front-notice-bar {
+  background-color: #fff9ea;
+  color: #e6a23c;
+  padding: 8px 20px;
+  font-size: 13px;
+  text-align: center;
+  border-bottom: 1px solid #ebeef5;
+  z-index: 1001;
+}
+
+/* 确保 manager.css 中的样式能正确应用，或在此处进行必要的覆盖和调整 */
+.manager-header {
+  /* background-color: #2c334c; */ /* 应由 manager.css 提供 */
+}
+
+.manager-header-left .title {
+  /* color: #ddd; */ /* 应由 manager.css 提供 */
+}
+
+.manager-header-center .el-breadcrumb {
+  margin-left: 20px;
+  line-height: 60px;
+}
+
+.manager-header-center .el-breadcrumb__inner,
+.manager-header-center .el-breadcrumb__item:last-child .el-breadcrumb__inner {
+  color: #a2a8be !important;
+}
+.manager-header-center .el-breadcrumb__item:last-child .el-breadcrumb__inner {
+  color: #fff !important;
+}
+
+.manager-header-center .el-breadcrumb__inner.is-link:hover,
+.manager-header-center .el-breadcrumb__item:last-child .el-breadcrumb__inner:hover {
+  color: #409EFF !important;
+}
+
+.manager-header-right .avatar-container {
+  margin-right: 20px;
+  cursor: pointer;
+}
+
+.manager-header-right .avatar-wrapper {
+  display: flex;
+  align-items: center;
+  color: #ccc;
+}
+
+.manager-header-right .user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+.manager-header-right .user-name {
+  font-size: 14px;
+}
+
+.manager-main-left {
+  /* width: 200px; */ /* 期望由 manager.css 控制 */
+  /* background-color: #222b40; */ /* 期望由 manager.css 控制 */
+  /* min-height: calc(100vh - 60px (头部高度) - (公告栏高度，如果存在)); */
+}
+
+.manager-main-left .el-menu {
+  height: 100%;
+}
+
+.el-menu-vertical-demo .el-menu-item i,
+.el-menu-vertical-demo .el-submenu__title i {
+  margin-right: 10px;
+  width: 24px; /* 与 manager.css 中对图标的定义保持一致 */
+  text-align: center; /* 与 manager.css 中对图标的定义保持一致 */
+  font-size: 18px; /* 与 manager.css 中对图标的定义保持一致 */
+  color: #ccc; /* 确保图标颜色 */
+}
+
+.el-menu-vertical-demo .el-menu-item.is-active i,
+.el-menu-vertical-demo .el-menu-item.is-active span {
+  color: #409EFF !important; /* Element UI 默认激活颜色或主题色 */
+}
+.el-menu-vertical-demo .el-menu-item.is-active {
+  background-color: #1d2637 !important; /* 激活项背景色，可微调 */
+}
+
+
+.el-menu-vertical-demo .el-menu-item:hover {
+  background-color: #001f3a !important; /* 鼠标悬浮时背景色 */
+}
+.el-menu-vertical-demo .el-menu-item:hover i,
+.el-menu-vertical-demo .el-menu-item:hover span {
+  color: #fff !important; /* 鼠标悬浮时文字和图标颜色 */
+}
+
 </style>
