@@ -25,10 +25,11 @@
         <el-table-column prop="week" label="上课星期"></el-table-column>
         <el-table-column prop="segment" label="上课时段"></el-table-column>
         <el-table-column prop="status" label="状态"></el-table-column>
-        <el-table-column label="操作" width="180" align="center" v-if="user.role === 'ADMIN'">
+        <el-table-column label="操作" width="280" align="center"> {/* 调整宽度以容纳新按钮 */}
           <template v-slot="scope">
-            <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini">编辑</el-button>
-            <el-button plain type="danger" size="mini" @click="handleDelete(scope.row.id)">删除</el-button>
+            <el-button plain type="primary" @click="handleEdit(scope.row)" size="mini" v-if="user.role === 'ADMIN'">编辑</el-button>
+            <el-button plain type="danger" size="mini" @click="handleDelete(scope.row.id)" v-if="user.role === 'ADMIN'" style="margin-left: 5px;">删除</el-button>
+            <el-button type="info" size="mini" @click="handleManageDiscussions(scope.row.id)" style="margin-left: 5px;" v-if="user.role === 'ADMIN' || user.role === 'TEACHER'">讨论管理</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -91,7 +92,7 @@
 
 <script>
 import { getCoursesPage, addCourse, updateCourse, deleteCourse } from '@/api/course'
-import { getAllTeachers } from '@/api/teacher' // 假设 teacher API 文件已创建或更新
+import { getAllTeachers } from '@/api/teacher'
 
 export default {
   name: "CourseManagement",
@@ -188,7 +189,15 @@ export default {
     },
     handleCurrentChange(pageNum) {
       this.load(pageNum);
+    },
+    // 新增方法：跳转到讨论管理页面
+    handleManageDiscussions(courseId) {
+      this.$router.push(`/course/${courseId}/manage-discussions`);
     }
   }
 }
 </script>
+
+<style scoped>
+/* 您现有的样式 */
+</style>

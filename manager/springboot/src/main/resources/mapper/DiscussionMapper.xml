@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.mapper.DiscussionMapper">
+
+    <sql id="Base_Column_List_Discussion">
+        d.id, d.student_id, d.content, d.create_time, d.reply, d.course_id
+    </sql>
+
+    <insert id="insert" parameterType="com.example.entity.Discussion" useGeneratedKeys="true" keyProperty="id">
+        insert into discussion (student_id, content, create_time, reply, course_id)
+        values (#{studentId}, #{content}, #{createTime}, #{reply}, #{courseId})
+    </insert>
+
+    <delete id="deleteById">
+        delete from discussion where id = #{id}
+    </delete>
+
+    <update id="updateById" parameterType="com.example.entity.Discussion">
+        update discussion
+        <set>
+            <if test="studentId != null">student_id = #{studentId},</if>
+            <if test="content != null">content = #{content},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="reply != null">reply = #{reply},</if>
+            <if test="courseId != null">course_id = #{courseId},</if>
+        </set>
+        where id = #{id}
+    </update>
+
+    <select id="selectById" resultType="com.example.entity.Discussion">
+        select
+        <include refid="Base_Column_List_Discussion"/>,
+        s.name as studentName,
+        s.avatar as studentAvatar,
+        c.name as courseName
+        from discussion d
+        left join student s on d.student_id = s.id
+        left join course c on d.course_id = c.id
+        where d.id = #{id}
+    </select>
+
+    <select id="selectAll" resultType="com.example.entity.Discussion">
+        select
+        <include refid="Base_Column_List_Discussion"/>,
+        s.name as studentName,
+        s.avatar as studentAvatar,
+        c.name as courseName
+        from discussion d
+        left join student s on d.student_id = s.id
+        left join course c on d.course_id = c.id
+        <where>
+            <if test="id != null"> and d.id = #{id}</if>
+            <if test="studentId != null"> and d.student_id = #{studentId}</if>
+            <if test="courseId != null"> and d.course_id = #{courseId}</if>
+            <if test="content != null and content != ''"> and d.content like concat('%', #{content}, '%')</if>
+        </where>
+        order by d.create_time desc
+    </select>
+
+    <select id="selectByCourseId" resultType="com.example.entity.Discussion">
+        select
+        <include refid="Base_Column_List_Discussion"/>,
+        s.name as studentName,
+        s.avatar as studentAvatar,
+        c.name as courseName
+        from discussion d
+        left join student s on d.student_id = s.id
+        left join course c on d.course_id = c.id
+        where d.course_id = #{courseId}
+        order by d.create_time desc
+    </select>
+
+    <select id="selectByStudentId" resultType="com.example.entity.Discussion">
+        select
+        <include refid="Base_Column_List_Discussion"/>,
+        s.name as studentName,
+        s.avatar as studentAvatar,
+        c.name as courseName
+        from discussion d
+        left join student s on d.student_id = s.id
+        left join course c on d.course_id = c.id
+        where d.student_id = #{studentId}
+        order by d.create_time desc
+    </select>
+
+</mapper>
